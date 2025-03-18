@@ -10,14 +10,15 @@ import androidx.recyclerview.widget.RecyclerView
 class ExpenseAdapter(
     private val names: ArrayList<String>,
     private val amounts: ArrayList<String>,
-    private val deleteExpense: (Int) -> Unit
+    private val dates: ArrayList<String>,
+    private val onItemClick: (Int) -> Unit
 ) : RecyclerView.Adapter<com.example.expensecalculator.ExpenseAdapter.ExpenseViewHolder>()
 {
 
     class ExpenseViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val nameText: TextView = view.findViewById(R.id.expenseName)
         val amountText: TextView = view.findViewById(R.id.expenseAmount)
-        val deleteButton: Button = view.findViewById(R.id.deleteButton)
+        val showDetailsButton: Button = view.findViewById(R.id.showDetailsButton)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): com.example.expensecalculator.ExpenseAdapter.ExpenseViewHolder {
@@ -29,8 +30,8 @@ class ExpenseAdapter(
     override fun onBindViewHolder(holder: com.example.expensecalculator.ExpenseAdapter.ExpenseViewHolder, position: Int) {
         holder.nameText.text = names[position]
         holder.amountText.text = "$${amounts[position]}"
-        holder.deleteButton.setOnClickListener {
-            deleteExpense(position)
+        holder.showDetailsButton.setOnClickListener {
+            onItemClick(position)
         }
     }
 

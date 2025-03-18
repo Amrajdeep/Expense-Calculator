@@ -1,5 +1,7 @@
 package com.example.expensecalculator
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
@@ -12,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 class MainActivity : AppCompatActivity() {
     private val expenseNames = ArrayList<String>()
     private val expenseAmounts = ArrayList<String>()
+    private val expenseDates = ArrayList<String>()
     private lateinit var adapter: ExpenseAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,9 +25,10 @@ class MainActivity : AppCompatActivity() {
         val expenseNameInput = findViewById<EditText>(R.id.expenseNameInput)
         val expenseAmountInput = findViewById<EditText>(R.id.expenseAmountInput)
         val addExpenseButton = findViewById<Button>(R.id.addExpenseButton)
+        val showDetailsButton = findViewById<Button>(R.id.showDetailsButton)
         val expenseRecyclerView = findViewById<RecyclerView>(R.id.expenseRecyclerView)
-        adapter = ExpenseAdapter(expenseNames, expenseAmounts) { position ->
-            deleteExpense(position)
+        adapter = ExpenseAdapter(expenseNames, expenseAmounts, expenseDates) { position ->
+            showExpenseDetails(position)
         }
         expenseRecyclerView.layoutManager = LinearLayoutManager(this)
         expenseRecyclerView.adapter = adapter
@@ -32,6 +36,7 @@ class MainActivity : AppCompatActivity() {
         addExpenseButton.setOnClickListener {
             val name = expenseNameInput.text.toString().trim()
             val amount = expenseAmountInput.text.toString().trim()
+            val date = "2025-03-17"
 
             if(name.isEmpty() || amount.isEmpty()) {
                 Toast.makeText(this, "Please enter both Name and Amount", Toast.LENGTH_SHORT).show()
@@ -39,6 +44,7 @@ class MainActivity : AppCompatActivity() {
             }
             expenseNames.add(name)
             expenseAmounts.add(amount)
+            expenseDates.add(date)
             adapter.notifyDataSetChanged()
 
 
@@ -46,9 +52,10 @@ class MainActivity : AppCompatActivity() {
             expenseNameInput.text.clear()
             expenseAmountInput.text.clear()
         }
-
-
-
+        showDetailsButton.setOnClickListener {
+            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.financialtips.com"))
+            startActivity(browserIntent)
+        }
     }
     override fun onStart() {
         super.onStart()
@@ -70,7 +77,19 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         Log.d("ActivityLifecycle","onDestroy called")
     }
-    private fun deleteExpense(position: Int) {
+    private fun showExpenseDetails(position: Int) {
+        val intent = Intent(this, ExpenseDetailsActivity::class.java)
+        intent.putExtra("EXPENSE_NAME", expenseNames[position])
+        intent.putExtra("EXPENSE_AMOUNT", expenseAmounts[position])
+        intent.putExtra("EXPENSE_DATE", expenseDates[position])
+        startActivity(intent)
+    }
+
+
+
+    }
+
+    /*private fun deleteExpense(position: Int) {
         val removedExpense = expenseNames[position]
         Toast.makeText(this, "Deleted: $removedExpense", Toast.LENGTH_SHORT).show()
         expenseNames.removeAt(position)
@@ -78,5 +97,5 @@ class MainActivity : AppCompatActivity() {
         adapter.notifyDataSetChanged()
 
 
-    }
-}
+    }**/
+
