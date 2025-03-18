@@ -1,6 +1,7 @@
 package com.example.expensecalculator
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -16,6 +17,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        Log.d("ActivityLifecycle", "onCreate called")
 
         val expenseNameInput = findViewById<EditText>(R.id.expenseNameInput)
         val expenseAmountInput = findViewById<EditText>(R.id.expenseAmountInput)
@@ -47,6 +49,26 @@ class MainActivity : AppCompatActivity() {
 
 
 
+    }
+    override fun onStart() {
+        super.onStart()
+        Log.d("ActivityLifecycle", "onStart called")
+    }
+    override fun onResume() {
+        super.onResume()
+        Log.d("ActivityLifecycle", "onResume called")
+    }
+    override fun onPause(){
+        super.onPause()
+        Log.d("ActivityLifecycle", "onPause called")
+    }
+    override fun onStop() {
+        super.onStop()
+        Log.d("ActivityLifecycle","onStop called")
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d("ActivityLifecycle","onDestroy called")
     }
     private fun deleteExpense(position: Int) {
         val removedExpense = expenseNames[position]
