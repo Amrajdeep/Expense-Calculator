@@ -8,32 +8,33 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 class ExpenseAdapter(
-    private val names: ArrayList<String>,
-    private val amounts: ArrayList<String>,
-    private val dates: ArrayList<String>,
-    private val onItemClick: (Int) -> Unit
-) : RecyclerView.Adapter<com.example.expensecalculator.ExpenseAdapter.ExpenseViewHolder>()
-{
+    private val expenses: MutableList<Expense>,
+    private val onShowDetails: (Int) -> Unit,
+    private val onDelete: (Int) -> Unit
+) : RecyclerView.Adapter<ExpenseAdapter.ExpenseViewHolder>() {
 
-    class ExpenseViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val nameText: TextView = view.findViewById(R.id.expenseName)
-        val amountText: TextView = view.findViewById(R.id.expenseAmount)
-        val showDetailsButton: Button = view.findViewById(R.id.showDetailsButton)
+    class ExpenseViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val expenseName: TextView = itemView.findViewById(R.id.expenseName)
+        val expenseAmount: TextView = itemView.findViewById(R.id.expenseAmount)
+        val expenseDate: TextView = itemView.findViewById(R.id.expenseDate)
+        val deleteButton: Button = itemView.findViewById(R.id.deleteButton)
+        val showDetailsButton: Button = itemView.findViewById(R.id.showDetailsButton)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): com.example.expensecalculator.ExpenseAdapter.ExpenseViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.expense_item, parent, false)
-        return com.example.expensecalculator.ExpenseAdapter.ExpenseViewHolder(view)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExpenseViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.expense_item, parent, false)
+        return ExpenseViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: com.example.expensecalculator.ExpenseAdapter.ExpenseViewHolder, position: Int) {
-        holder.nameText.text = names[position]
-        holder.amountText.text = "$${amounts[position]}"
-        holder.showDetailsButton.setOnClickListener {
-            onItemClick(position)
-        }
+    override fun onBindViewHolder(holder: ExpenseViewHolder, position: Int) {
+        val expense = expenses[position]
+        holder.expenseName.text = expense.name
+        holder.expenseAmount.text = "$${expense.amount}"
+        holder.expenseDate.text = expense.date
+
+        holder.deleteButton.setOnClickListener { onDelete(position) }
+        holder.showDetailsButton.setOnClickListener { onShowDetails(position) }
     }
 
-    override fun getItemCount(): Int = names.size
+    override fun getItemCount(): Int = expenses.size
 }
