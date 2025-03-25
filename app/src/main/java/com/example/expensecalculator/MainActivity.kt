@@ -1,5 +1,6 @@
 package com.example.expensecalculator
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -10,6 +11,11 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import org.json.JSONArray
+import org.json.JSONObject
+import java.io.File
+import java.io.FileInputStream
+import java.io.InputStreamReader
 
 class MainActivity : AppCompatActivity() {
     private val expenseList = mutableListOf<Expense>()
@@ -35,6 +41,7 @@ class MainActivity : AppCompatActivity() {
         expenseRecyclerView.adapter = adapter
 
         loadFragments()
+        loadExpensesFromFile()
 
         addExpenseButton.setOnClickListener {
             val name = expenseNameInput.text.toString().trim()
@@ -49,6 +56,7 @@ class MainActivity : AppCompatActivity() {
             val newExpense = Expense(name, amount, date)
             expenseList.add(newExpense)
             adapter.notifyDataSetChanged()
+            saveExpensesToFile()
 
             updateTotalExpense()
 
@@ -102,7 +110,50 @@ class MainActivity : AppCompatActivity() {
         Toast.makeText(this, "Deleted: ${removedExpense.name}", Toast.LENGTH_SHORT).show()
         expenseList.removeAt(position)
         adapter.notifyDataSetChanged()
+        saveExpensesToFile()
         updateTotalExpense()
+    }
+    private fun saveExpensesToFile() {
+        val jsonArray = JSONArray()
+        for (expense in expenseList) {
+            val obj = JSONObject()
+            obj.put("name", expense.name)
+            obj.put("amount", expense.amount)
+            obj.put("date", expense.date)
+            jsonArray.put(obj)
+        }
+        val jsonString = jsonArray.toString()
+        try {
+            openFileOutput("expenses.json", Context.MODE_PRIVATE).use {
+                it.write(jsonString.toByteArray())
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+    private fun loadExpensesFromFile() {
+        try {
+            val file = File(filesDir, "expenses.json")
+            if(!file.exists()) return
+
+            val inputStream = FileInputStream(file)
+            val reader = InputStreamReader(inputStream)
+            val content = reader.readText()
+            reader.close()
+
+            val jsonArray = JSONArray(content)
+            for (i in 0 until jsonArray.length()) {
+                val obj = jsonArray.getJSONObject(i)
+                val name = obj.getString("name")
+                val amount = obj.getDouble("amount")
+                val date = obj.getString("date")
+                expenseList.add(Expense(name, amount, date))
+            }
+            adapter.notifyDataSetChanged()
+            updateTotalExpense()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     override fun onStart() {
